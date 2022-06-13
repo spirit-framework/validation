@@ -34,7 +34,7 @@ class MaxValidator implements Validator
     use Length;
 
     /** @var string $msg The error message to return if the object is not null. */
-    private string $msg = "The current data is too long. The current length of the data is `{length}`.";
+    private string $msg = "The `{field}` field is too short. The current length of the `{field}` field is `{length}`.";
 
     /** @var int|double $object The object's length. */
     private int|double $currLength = 0;
@@ -56,10 +56,13 @@ class MaxValidator implements Validator
     }
 
     /**
+     * @param string $field The field name to repensent.
+     *
      * {@inheritDoc}
      */
-    public function parseErrorMsg(): void
+    public function parseErrorMsg(string $field = 'data'): void
     {
         $this->msg = str_replace('{length}', $this->msg, strval($this->currLength));
+        $this->msg = str_replace('{field}', $this->msg, $field);
     }
 }
