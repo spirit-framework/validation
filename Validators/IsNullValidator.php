@@ -32,17 +32,13 @@ class IsNullValidator implements Validator
     use Errors;
 
     /** @var string $msg The error message to return if the object is not null. */
-    private string $msg = "The current object has a `{type}` data type.";
-
-    /** @var mixed $object The object passed. */
-    private mixed $object = null;
+    private string $msg = "The current data is not null.";
 
     /**
      * {@inheritDoc}
      */
     public function validate(mixed $object): bool
     {
-        $this->object = $object;
         return is_null($object);
     }
 
@@ -51,6 +47,6 @@ class IsNullValidator implements Validator
      */
     public function parseErrorMsg(): void
     {
-        $this->msg = str_replace('{type}', $this->msg, gettype($this->object));
+        //
     }
 }

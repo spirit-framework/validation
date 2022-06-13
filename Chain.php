@@ -23,30 +23,19 @@
  * SOFTWARE.
  */
 
-namespace Spirit\Validation\Validators;
+namespace Spirit\Validation;
 
-use Spirit\Validation\Errors;
+use Spirit\Validation\Validator;
 
-class IsNotNullValidator implements Validator
+interface Chain
 {
-    use Errors;
-
-    /** @var string $msg The error message to return if the object is null. */
-    private string $msg = "The current data is null.";
-
     /**
-     * {@inheritDoc}
+     * Chains the validators together.
+     *
+     * @param \Spirit\Validation\Validators\Validator|array $validators A validator or a list of
+     *                                                                  validators to chain together.
+     *
+     * @return void Returns nothing.
      */
-    public function validate(mixed $object): bool
-    {
-        return !is_null($object);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function parseErrorMsg(): void
-    {
-        //
-    }
+    public function add(Validator|array $validators): void;
 }

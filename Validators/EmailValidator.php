@@ -26,37 +26,33 @@
 namespace Spirit\Validation\Validators;
 
 use Egulias\EmailValidator\EmailValidator;
-use Egulias\EmailValidator\Validation\DNSCheckValidation;
+use Egulias\EmailValidator\Validation\EmailValidation;
 use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
-use Egulias\EmailValidator\Validation\RFCValidation;
 use Spirit\Validation\Errors;
 
-class MaxValidator implements Validator
+class EmailValidator implements Validator
 {
     use Errors;
 
-    /** @var string $msg The error message to return if the object is not null. */
-    private string $msg = "The current object is not a valid email.";
+    /** @var string $msg The error message to return if the email is not valid. */
+    private string $msg = "The current email provided is invalid.";
 
     /**
-     * @param bool $bool Should we do a dns lookup.
+     * @param array<\Egulias\EmailValidator\Validation\EmailValidation> $emailValidations A list of email validations to preform.
      *
      * {@inheritDoc}
      */
-    public function validate(mixed $object, bool $dnsCheck = false): bool
+    public function validate(mixed $object, array $emailValidations = []): bool
     {
         if (!is_string($object)) {
-            return true;
+            return false;
         }
         $validator = new EmailValidator();
-        if ($dnsCheck) {
-            $multipleValidations = new MultipleValidationWithAnd([
-                new RFCValidation(),
-                new DNSCheckValidation()
-            ]);
+        if (count($emailValidations) !== 1) {
+            $multipleValidations = new MultipleValidationWithAnd($emailValidations);
             return $validator->isValid($object, $multipleValidations);
         }
-        return $validator->isValid($object, new RFCValidation());
+        return $validator->isValid($object, $emailValidations[0]);
     }
 
     /**

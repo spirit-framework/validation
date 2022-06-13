@@ -34,7 +34,7 @@ class MaxValidator implements Validator
     use Length;
 
     /** @var string $msg The error message to return if the object is not null. */
-    private string $msg = "The current object is too long. The current length of the object is `{length}`.";
+    private string $msg = "The current data is too long. The current length of the data is `{length}`.";
 
     /** @var int|double $object The object's length. */
     private int|double $currLength = 0;
@@ -48,7 +48,7 @@ class MaxValidator implements Validator
     {
         if (!is_int($object) || !is_string($object) || !is_array($object) || !is_double($object)) {
             if (!($object instanceof Countable)) {
-                return true;
+                return false;
             }
         }
         $this->currLength = $this->getLength($object);

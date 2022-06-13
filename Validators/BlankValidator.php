@@ -27,26 +27,33 @@ namespace Spirit\Validation\Validators;
 
 use Spirit\Validation\Errors;
 
-class IsNotNullValidator implements Validator
+class BlankValidator implements Validator
 {
     use Errors;
 
-    /** @var string $msg The error message to return if the object is null. */
-    private string $msg = "The current data is null.";
+    /** @var string $msg The error message to return if the object is not null. */
+    private string $msg = "The {field} field is required.";
 
     /**
+     * @param bool $trimObject Should we trim the object.
+     *
      * {@inheritDoc}
      */
-    public function validate(mixed $object): bool
+    public function validate(mixed $object, bool $trimObject = true): bool
     {
-        return !is_null($object);
+        if (!is_string($object)) {
+            return false;
+        }
+        return empty($object) || trim($object) === '';
     }
 
     /**
+     * @param string $field The field name to repensent.
+     *
      * {@inheritDoc}
      */
-    public function parseErrorMsg(): void
+    public function parseErrorMsg(string $field = 'data'): void
     {
-        //
+        $this->msg = str_replace('{field}', $this->msg, $field);
     }
 }

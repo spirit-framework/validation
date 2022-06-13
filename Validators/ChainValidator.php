@@ -25,21 +25,34 @@
 
 namespace Spirit\Validation\Validators;
 
+use Spirit\Validation\Chain;
 use Spirit\Validation\Errors;
 
-class IsNotNullValidator implements Validator
+class ChainValidator implements Validator, Chain
 {
     use Errors;
 
-    /** @var string $msg The error message to return if the object is null. */
-    private string $msg = "The current data is null.";
+    /** @var string $msg The error message to return if the object is invalid. */
+    private string $msg = ""; // Set to nothing since this validator is based off other validators.
+
+    /** @var array $validators A list of validators to chain together. */
+    private array $validators = [];
+
+    /** @var \Spirit\Validation\Validators\Validator|null $errorValidator The validator causing the error. */
+    private Validator|null $errorValidator = null;
 
     /**
      * {@inheritDoc}
      */
     public function validate(mixed $object): bool
     {
-        return !is_null($object);
+        foreach ($this->validators as $validator) {
+            if (!$validator->validate($object)) {
+                $this->errorValidator = $validator;
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -47,6 +60,24 @@ class IsNotNullValidator implements Validator
      */
     public function parseErrorMsg(): void
     {
-        //
+        if (!is_null($this->errorValidator)) {
+            $this->errorValidator->parseErrorMsg();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function add(Validator|array $validators): void
+    {
+        if (is_array($validators)) {
+            foreach ($validators as $validator) {
+                if ($validator instanceof Validator) {
+                    $this->validators[] = $validator;
+                }
+            }
+        } else {
+            $this->validators[] = $validators;
+        }
     }
 }
